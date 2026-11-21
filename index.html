@@ -235,6 +235,19 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 .pill.s{background:var(--frost);color:var(--atx);box-shadow:none}
 .offbar{position:fixed;top:0;left:0;right:0;z-index:400;padding:calc(6px + env(safe-area-inset-top)) 12px 6px;background:var(--warn);color:#fff;text-align:center;font-size:.78rem;font-weight:600;transform:translateY(-100%);transition:transform .4s var(--ease)}
 .offbar.show{transform:none}
+.offline-gate{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,35,71,.58);opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.offline-gate.show{opacity:1;pointer-events:auto}
+.offline-card{width:min(100%,390px);overflow:hidden;border-radius:30px;background:var(--surf);box-shadow:0 24px 70px rgba(0,0,0,.28);direction:rtl}
+.offline-track{position:relative;min-height:360px}
+.offline-pane{position:absolute;inset:0;padding:28px 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center;gap:14px;transition:transform .5s var(--ease)}
+.offline-pane.confirm{transform:translateX(-110%)}
+.offline-gate.confirm .offline-pane.first{transform:translateX(110%)}
+.offline-gate.confirm .offline-pane.confirm{transform:none}
+.offline-icon{width:76px;height:76px;border-radius:26px;display:grid;place-items:center;background:var(--warnb);color:var(--warn);font-size:2.2rem;box-shadow:0 10px 24px rgba(var(--shd),.12)}
+.offline-pane h2{font-size:1.35rem;margin-top:2px}
+.offline-pane p{color:var(--mut);font-size:.9rem;line-height:1.9;max-width:300px}
+.offline-actions{width:100%;margin-top:6px}
+.offline-actions .btn{margin-top:10px}
 .sr{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}.sr>b{font-size:.9rem;color:var(--atx)}
 .stp2{display:flex;align-items:center;background:var(--frost);border-radius:12px;overflow:hidden}.stp2 button{width:30px;height:28px;font-weight:700;font-size:1.1rem;color:var(--atx)}.stp2 button:active{background:var(--sky)}.stp2 span{min-width:28px;text-align:center;font-size:.84rem;font-weight:700}
 .gh{display:flex;align-items:center;gap:10px;width:100%;text-align:right;padding:10px 4px 6px;margin-top:8px}
@@ -251,7 +264,23 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 </style>
 </head>
 <body>
-<div id="offbar" class="offbar">أنت غير متصل — بياناتك محفوظة على جهازك والتطبيق يعمل بشكل طبيعي</div>
+<div id="offbar" class="offbar">أنت غير متصل — اختر الإكمال بدون نت للمتابعة</div>
+<div id="offline-gate" class="offline-gate" aria-modal="true" role="dialog">
+  <div class="offline-card">
+    <div class="offline-track">
+      <section class="offline-pane first">
+        <div class="offline-icon">⌁</div><h2>أنت غير متصل</h2>
+        <p>لا يوجد اتصال بالإنترنت حاليًا. يمكنك المحاولة مرة أخرى أو فتح التطبيق بوضع عدم الاتصال.</p>
+        <div class="offline-actions"><button class="btn" id="offline-retry">إعادة المحاولة</button><button class="btn s" id="offline-next">الدخول بدون نت</button></div>
+      </section>
+      <section class="offline-pane confirm">
+        <div class="offline-icon">!</div><h2>متأكد من المتابعة؟</h2>
+        <p>لن يتم حفظ أي تغيير على الحساب أو مزامنته حتى يعود اتصال الإنترنت.</p>
+        <div class="offline-actions"><button class="btn" id="offline-enter">الإكمال بدون نت</button><button class="btn s" id="offline-back">إعادة المحاولة</button></div>
+      </section>
+    </div>
+  </div>
+</div>
 <i class="blob b1"></i><i class="blob b2"></i>
 
 <!-- WELCOME -->
@@ -348,11 +377,11 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
       </div>
       <div class="sec">الالتزامات الشهرية <button class="pill" id="add-bill">+ التزام</button></div>
       <div class="list" id="bill-list"></div>
-      <div class="sec">الحركات المالية <button class="pill" id="add-tx">+ حركة</button></div>
+      <div class="sec">مصروفات هذا الشهر <button class="pill" id="add-tx">+ حركة</button></div>
       <div class="glass card" id="b-cats"></div>
       <div class="list" id="tx-list"></div>
       <div class="sec">نتائج الأشهر السابقة</div><div class="glass card" id="hist"></div>
-      <div class="sec">التسعير <button class="pill" id="add-price">+ سعر</button></div>
+      <div class="sec">التسعير <span style="display:flex;gap:8px"><button class="pill s" id="price-toggle">إخفاء</button><button class="pill" id="add-price">+ سعر</button></span></div>
       <p class="mut" style="margin:-4px 2px 10px;line-height:1.7;font-size:.8rem">سجّل سعر منتجاتك مرة واحدة، فتظهر تلقائيًا عند إضافتها في المقاضي.</p>
       <div class="list" id="price-list"></div>
       <div class="sec">الأهداف <button class="pill" id="add-fut">+ هدف</button></div>
@@ -485,6 +514,8 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 </div></div>
 
 <div class="ov" id="m-res"><div class="sheet"><div class="handle"></div><h3>نتيجة الشهر</h3><div id="res-body"></div></div></div>
+<div class="ov" id="m-prices"><div class="sheet"><div class="handle"></div><h3>كل الأسعار المسجلة</h3><div class="list" id="prices-all"></div></div></div>
+<div class="ov" id="m-tx"><div class="sheet"><div class="handle"></div><h3>كل مصروفات هذا الشهر</h3><div class="list" id="tx-all"></div></div></div>
 
 <div class="toast" id="toast"><span id="toast-t"></span><button id="toast-u" style="display:none">تراجع</button></div>
 
@@ -607,14 +638,15 @@ stage.addEventListener('touchend',e=>{if(e.target.closest('.rail,.row,input'))re
   if(Math.abs(dx)>80&&Math.abs(dx)>Math.abs(dy)*2){const i=order.indexOf(pg)+(dx<0?1:-1);if(order[i])show(order[i])}},{passive:true});
 
 /* ===== swipe rows ===== */
-let drag=null;const W=136;
+let drag=null;const W=136,DELETE_X=92;
 document.addEventListener('pointerdown',e=>{const r=e.target.closest('.row');if(!r||e.target.closest('[data-a]'))return;
   document.querySelectorAll('.row.open').forEach(x=>{if(x!==r){x.classList.remove('open');x.firstElementChild.nextElementSibling.style.transform=''}});
-  drag={r,b:r.querySelector('.body'),x:e.clientX,y:e.clientY,open:r.classList.contains('open'),moved:false}});
-document.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>6){drag.moved=true;drag.r.classList.add('drag')}
+  const b=r.querySelector('.body');try{b.setPointerCapture(e.pointerId)}catch(_){}
+  drag={r,b,x:e.clientX,y:e.clientY,open:r.classList.contains('open'),moved:false,t:0,pointerId:e.pointerId}});
+document.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.pointerId)return;const dx=e.clientX-drag.x;if(Math.abs(dx)>6){drag.moved=true;drag.r.classList.add('drag')}
   if(!drag.moved)return;let t=(drag.open?-W:0)+dx;t=Math.max(-W,Math.min(0,t));drag.b.style.transform=`translateX(${t}px)`;drag.t=t});
 const endDrag=()=>{if(!drag)return;const{r,b,moved,t}=drag;r.classList.remove('drag');
-  if(moved){const o=t<-W/2;r.classList.toggle('open',o);b.style.transform=o?`translateX(${-W}px)`:'';drag.cancelTap=true;setTimeout(()=>drag=null,0)}else drag=null};
+  if(moved){if(t<=-DELETE_X){const k=r.dataset.k,id=r.dataset.id;drag=null;del(k,id);return}const o=t<-W/2;r.classList.toggle('open',o);b.style.transform=o?`translateX(${-W}px)`:'';drag.cancelTap=true;setTimeout(()=>drag=null,0)}else drag=null};
 document.addEventListener('pointerup',endDrag);document.addEventListener('pointercancel',endDrag);
 const ARR=k=>({n:needs,s:shop,f:fut,b:bud.bills,x:bud.extra,t:bud.tx,p:bud.prices})[k];
 function find(k,id){return ARR(k).find(x=>x.id===id)}
@@ -650,7 +682,7 @@ $('add-need').onclick=addNeed;
 $('n-save').onclick=()=>{const d={name:val('n-name'),category:$('n-cat').value,current:val('n-cur'),required:val('n-req'),status:$('n-st').value};if(!d.name){$('n-name').focus();return toast('اكتب اسم المنتج أولًا')}
   const id=$('n-id').value;id?Object.assign(find('n',id),d):needs.unshift({id:uid(),...d});close('m-need');render()};
 
-let shopQ='',hideDone=false,colp={},secK='needs',secI='box';
+let shopQ='',hideDone=false,colp={},secK='needs',secI='box',priceCollapsed=!!bud.priceCollapsed;
 const SIC=['kitchen','pantry','clean','devices','user','wrench','box','cart','leaf','drop','heart','car','book','gift','bed','tag','home','pin'];
 const secOf=i=>shopSecs.some(x=>x.name===i.sec)?i.sec:'بدون قسم';
 function fillSel(){$('n-cat').innerHTML=cats.map(c=>`<option>${esc(c.name)}</option>`).join('');$('sh-sec').innerHTML=shopSecs.map(c=>`<option>${esc(c.name)}</option>`).join('')+'<option value="">بدون قسم</option>'}
@@ -697,9 +729,15 @@ document.addEventListener('click',e=>{const t=e.target;let b;
   else if(b=t.closest('.gh')){const k=b.dataset.col;colp[k]=!colp[k];renderShop()}});
 /* ===== التسعير ===== */
 const nz=t=>String(t||'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ة/g,'ه').replace(/ى/g,'ي').trim();
-function renderPrices(){$('price-list').innerHTML=bud.prices.length?bud.prices.map(i=>rowHTML(i.id,'p',`<div class="ic">${ic('tag')}</div>`,`<b>${esc(i.name)}</b><small>${i.unit?'لكل '+esc(i.unit):'سعر الوحدة'}</small>`,`<span class="badge b-ok">${money(i.price)}</span>`)).join(''):emptyBox('tag','لا أسعار مسجّلة','سجّل سعر مويه وخبز وغيرها، وسيكتبها التطبيق عنك في المقاضي.','أضف سعرًا','openPrice')}
+function priceRow(i){return rowHTML(i.id,'p',`<div class="ic">${ic('tag')}</div>`,`<b>${esc(i.name)}</b><small>${i.unit?'لكل '+esc(i.unit):'سعر الوحدة'}</small>`,`<span class="badge b-ok">${money(i.price)}</span>`)}
+function renderPrices(){const P=bud.prices||[];$('price-toggle').style.display=P.length?'':'none';$('price-toggle').textContent=priceCollapsed?'إظهار الكل':'إخفاء';
+  if(!P.length){$('price-list').innerHTML=emptyBox('tag','لا أسعار مسجّلة','سجّل سعر مويه وخبز وغيرها، وسيكتبها التطبيق عنك في المقاضي.','أضف سعرًا','openPrice');return}
+  const shown=priceCollapsed?P.slice(0,1):P;$('price-list').innerHTML=shown.map(priceRow).join('')+(priceCollapsed&&P.length>1?`<button class="btn s" id="price-more">عرض المزيد · ${num(P.length-1)} أسعار</button>`:'')}
+function openPrices(){$('prices-all').innerHTML=(bud.prices||[]).map(priceRow).join('')||'<p class="mut">لا توجد أسعار مسجلة.</p>';open('m-prices')}
 function openPrice(id){const i=id?bud.prices.find(x=>x.id===id):null;$('pr-id').value=id||'';$('pr-t').textContent=i?'تعديل سعر':'إضافة سعر';$('pr-name').value=i?i.name:'';$('pr-price').value=i?i.price:'';$('pr-unit').value=i&&i.unit||'';open('m-price');setTimeout(()=>$('pr-name').focus(),350)}
 const editPrice=id=>openPrice(id);$('add-price').onclick=()=>openPrice();
+$('price-toggle').onclick=()=>{priceCollapsed=!priceCollapsed;bud.priceCollapsed=priceCollapsed;sv('bud',bud);renderPrices()};
+document.addEventListener('click',e=>{if(e.target.closest('#price-more'))openPrices();if(e.target.closest('#tx-more'))open('m-tx')});
 $('pr-save').onclick=()=>{const name=val('pr-name'),price=toN($('pr-price').value),unit=val('pr-unit');if(!name||price<=0)return toast('اكتب اسم المنتج وسعره');
   const id=$('pr-id').value,ex=bud.prices.find(x=>nz(x.name)===nz(name)&&x.id!==id);if(ex&&!confirm('«'+ex.name+'» مسجّل مسبقًا. تحديث سعره؟'))return;
   if(ex){Object.assign(ex,{name,price,unit});if(id)bud.prices=bud.prices.filter(x=>x.id!==id)}else if(id)Object.assign(bud.prices.find(x=>x.id===id),{name,price,unit});else bud.prices.unshift({id:uid(),name,price,unit});
@@ -758,7 +796,9 @@ function renderBud(){const C=calc(),tot=Math.max(1,bud.cur+C.inc);
   $('bill-list').innerHTML=bud.bills.length?bud.bills.map(i=>{const paid=i.paidP===bud.pid,dd=daysTo(i.day,paid);return rowHTML(i.id,'b',`<div class="ic">${ic('list')}</div>`,`<b>${esc(i.name)}</b><small>يوم ${num(i.day)} من كل شهر · ${dd===0?'اليوم':'بعد '+num(dd)+' يوم'}</small>`,`<button class="badge ${paid?'b-ok':dd<=3?'b-low':'b-n'}" data-a="pay">${paid?'✓ سُدّد':'سدّد '+money(i.amount)}</button>`)}).join(''):emptyBox('list','لا التزامات شهرية','أضف الإيجار والفواتير والاشتراكات لتُحسب من ميزانيتك.','أضف التزامًا','addBill');
   const mo=today().slice(0,7),sp={};curTx().filter(t=>t.type==='out').forEach(t=>sp[t.cat]=(sp[t.cat]||0)+t.amount);const t2=Object.values(sp).reduce((a,b)=>a+b,0);
   $('b-cats').innerHTML=`<h3 style="margin-bottom:6px">مصروف هذا الشهر</h3>`+(t2?Object.entries(sp).sort((a,b)=>b[1]-a[1]).map(([k,v])=>bar(k,v,'',t2)).join(''):'<p class="mut">لا مصروفات مسجلة بعد.</p>');
-  $('tx-list').innerHTML=bud.tx.length?bud.tx.slice(0,30).map(i=>rowHTML(i.id,'t',`<div class="ic">${ic(i.type==='in'?'plus':'cart')}</div>`,`<b>${esc(i.name)}</b><small>${i.cat} · ${i.date}</small>`,`<span class="badge ${i.type==='in'?'b-ok':'b-out'}">${i.type==='in'?'+':'−'}${money(i.amount)}</span>`)).join(''):emptyBox('wallet','لا حركات مالية بعد','سجّل مصروفاتك ودخلك ليتحدّث رصيدك تلقائيًا.','سجّل حركة','addTx');
+  const monthTx=curTx(),shownTx=monthTx.slice(0,5);
+  $('tx-list').innerHTML=monthTx.length?shownTx.map(i=>rowHTML(i.id,'t',`<div class="ic">${ic(i.type==='in'?'plus':'cart')}</div>`,`<b>${esc(i.name)}</b><small>${i.cat} · ${i.date}</small>`,`<span class="badge ${i.type==='in'?'b-ok':'b-out'}">${i.type==='in'?'+':'−'}${money(i.amount)}</span>`)).join('')+(monthTx.length>5?'<button class="btn s" id="tx-more">عرض المزيد · كل المصروفات</button>':''):emptyBox('wallet','لا مصروفات هذا الشهر','سجّل مصروفاتك ودخلك ليتحدّث رصيدك تلقائيًا.','سجّل حركة','addTx');
+  $('tx-all').innerHTML=monthTx.length?monthTx.map(i=>rowHTML(i.id,'t',`<div class="ic">${ic(i.type==='in'?'plus':'cart')}</div>`,`<b>${esc(i.name)}</b><small>${i.cat} · ${i.date}</small>`,`<span class="badge ${i.type==='in'?'b-ok':'b-out'}">${i.type==='in'?'+':'−'}${money(i.amount)}</span>`)).join(''):'<p class="mut">لا مصروفات مسجلة هذا الشهر.</p>';
   renderStages();renderHist();
 }
 let bxMode='tx';
@@ -818,7 +858,9 @@ function showRes(r,prev){const g=r.net>=0,df=prev?r.net-prev.net:null,sh=r.top&&
 function closeMonth(){const S=stats();if(!S.inn&&!S.out)return toast('لا توجد حركات في هذا الشهر لإغلاقه');
   if(thisMonth()<=bud.month&&!confirm('لم ينتهِ الشهر بعد. هل تريد إغلاقه الآن وبدء شهر جديد؟'))return;
   const r={id:uid(),m:bud.month,inn:S.inn,out:S.out,net:S.net,top:S.top||null,bp:bud.bills.filter(b=>b.paidP===bud.pid).length,bt:bud.bills.length},prev=bud.history[0];
-  bud.history.unshift(r);bud.pid++;bud.month=thisMonth();bud.start=today();render();showRes(r,prev)}
+  bud.history.unshift(r);
+  const oldPid=bud.pid;bud.tx=bud.tx.filter(t=>(t.p||1)!==oldPid);bud.cur=0;bud.bills.forEach(b=>b.paidP=0);
+  bud.pid++;bud.month=thisMonth();bud.start=today();render();toast('بدأ شهر جديد — تم تصفير الرصيد والإبقاء على قوائمك');showRes(r,prev)}
 $('stages').onclick=e=>{if(e.target.id==='b-close')closeMonth()};
 $('hist').onclick=e=>{const r=e.target.closest('[data-h]');if(r){const i=+r.dataset.h;showRes(bud.history[i],bud.history[i+1])}};
 $('nowbox').onclick=e=>{const b=e.target.closest('[data-act]');if(b)act(b.dataset.act)};
@@ -849,8 +891,14 @@ $('w-login').onclick=openAuth;
 /* ===== boot ===== */
 if(user){$('welcome').style.display='none';enter()}else{paint();$('app').style.display='none'}
 /* ===== PWA ===== */
-let dip=null,swr=null;
+let dip=null,swr=null,offlineMode=false;
 const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const offlineGate=$('offline-gate');
+function showOfflineGate(){if(navigator.onLine||offlineMode)return;offlineGate.classList.remove('confirm');offlineGate.classList.add('show');$('offbar').classList.remove('show')}
+$('offline-retry').onclick=()=>location.reload();
+$('offline-next').onclick=()=>offlineGate.classList.add('confirm');
+$('offline-back').onclick=()=>offlineGate.classList.remove('confirm');
+$('offline-enter').onclick=()=>{offlineMode=true;offlineGate.classList.remove('show','confirm');$('offbar').classList.remove('show');toast('تعمل الآن بدون اتصال — لن تتم مزامنة التغييرات')};
 function pwaUI(){const b=$('pwa-box');if(!b)return;const iOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   b.innerHTML=`<div class="trow"><span>العمل بدون إنترنت</span><span class="badge ${swr&&swr.active?'b-ok':'b-low'}">${swr&&swr.active?'جاهز ✓':'قيد التجهيز'}</span></div><div class="trow"><span>حالة التثبيت</span><span class="badge ${standalone()?'b-ok':'b-n'}">${standalone()?'مثبّت ✓':'داخل المتصفح'}</span></div><div class="trow"><span>الاتصال الآن</span><span class="badge ${navigator.onLine?'b-ok':'b-low'}">${navigator.onLine?'متصل':'غير متصل'}</span></div>`
   +(standalone()?'':dip?'<button class="btn" id="pwa-in" style="margin-top:12px">تثبيت التطبيق على جهازك</button>':iOS?'<p class="mut" style="line-height:1.8;margin-top:10px">للتثبيت على آيفون: اضغط زر المشاركة ثم «إضافة إلى الشاشة الرئيسية».</p>':'')
@@ -860,7 +908,7 @@ addEventListener('appinstalled',()=>{dip=null;pwaUI();toast('تم تثبيت ا�
 $('pwa-box').onclick=async e=>{const id=e.target.id;
   if(id==='pwa-in'&&dip){dip.prompt();await dip.userChoice.catch(()=>{});dip=null;pwaUI()}
   if(id==='pwa-up'){if(!swr)return toast('لم يُجهَّز التطبيق بعد');try{await swr.update();toast('أنت على آخر إصدار')}catch(x){toast('تعذّر التحقق، تأكد من الاتصال')}}};
-const net=()=>{$('offbar').classList.toggle('show',!navigator.onLine);pwaUI()};addEventListener('online',net);addEventListener('offline',net);
+const net=()=>{if(navigator.onLine){offlineMode=false;offlineGate.classList.remove('show','confirm');$('offbar').classList.remove('show')}else if(!offlineMode)showOfflineGate();pwaUI()};addEventListener('online',net);addEventListener('offline',net);
 if('serviceWorker' in navigator){const had=!!navigator.serviceWorker.controller;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had)toast('تحديث جديد جاهز',()=>location.reload(),'حدّث',12000)});
   addEventListener('load',async()=>{try{swr=await navigator.serviceWorker.register('./sw.js');await navigator.serviceWorker.ready;pwaUI();if(navigator.onLine&&navigator.serviceWorker.controller)navigator.serviceWorker.controller.postMessage('WARM');else if(navigator.onLine&&swr.active)swr.active.postMessage('WARM')}catch(e){}})}
