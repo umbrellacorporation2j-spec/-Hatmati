@@ -10,8 +10,8 @@
 <meta name="apple-mobile-web-app-title" content="خدماتي"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <title>خدماتي | KHADAMATI</title>
-<link rel="icon" href="assets/logo.png" type="image/png"/>
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png"/>
+<link rel="icon" href="logo.png" type="image/png"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 <link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet" crossorigin="anonymous"/>
@@ -165,6 +165,13 @@ svg.i{width:1.3em;height:1.3em;fill:none;stroke:currentColor;stroke-width:1.8;st
 .sheet{width:100%;max-width:520px;max-height:90vh;overflow-y:auto;background:var(--surf);border-radius:calc(var(--r) + 8px) calc(var(--r) + 8px) 0 0;padding:8px 20px calc(24px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .5s var(--ease)}
 .ov.show .sheet{transform:none}
 .sheet.drag{transition:none}
+.auth-loading{position:absolute;inset:0;z-index:4;display:flex;align-items:flex-end;background:rgba(10,35,71,.42);opacity:0;pointer-events:none;transition:opacity .25s var(--ease)}
+.auth-loading.show{opacity:1;pointer-events:auto}
+.auth-loading-card{width:100%;padding:30px 22px calc(28px + env(safe-area-inset-bottom));border-radius:28px 28px 0 0;background:var(--surf);text-align:center;transform:translateY(110%);transition:transform .5s var(--ease);box-shadow:0 -16px 40px rgba(var(--shd),.18)}
+.auth-loading.show .auth-loading-card{transform:none}
+.auth-spinner{width:44px;height:44px;margin:0 auto 12px;border:4px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+.auth-loading-card b{display:block;font-size:1.05rem}.auth-loading-card p{margin-top:5px;color:var(--mut);font-size:.82rem}
+@keyframes spin{to{transform:rotate(360deg)}}
 .handle{width:44px;height:5px;border-radius:5px;background:var(--line);margin:6px auto 14px;touch-action:none}
 .sheet h3{text-align:center;font-size:1.1rem;margin-bottom:18px}
 .two{display:flex;gap:10px;margin-top:18px}
@@ -285,7 +292,7 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 
 <!-- WELCOME -->
 <div id="welcome">
-  <div class="w-top"><img src="assets/logo.png" alt="خدماتي"/><button class="skip" id="skip">تخطي</button></div>
+  <div class="w-top"><img src="logo.png" alt="خدماتي"/><button class="skip" id="skip">تخطي</button></div>
   <div class="track" id="track">
     <section class="slide">
       <div class="art"><div class="disc"></div><div class="core" data-i="home"></div><div class="chip" data-i="box"></div><div class="chip" data-i="cart"></div><div class="chip" data-i="wallet"></div></div>
@@ -416,7 +423,7 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
   <div class="fg"><label for="sh-sec">القسم</label><select id="sh-sec"></select></div>
   <div class="two" style="margin:0 0 14px"><div class="fg" style="flex:1;margin:0"><label for="sh-qty">الكمية</label><div class="qs"><button type="button" data-q="-1">−</button><input id="sh-qty" inputmode="decimal" value="1"/><button type="button" data-q="1">+</button></div></div><div class="fg" style="flex:1;margin:0"><label for="sh-unit">الوحدة</label><input id="sh-unit" list="units" placeholder="كجم، علبة…"/></div></div>
   <datalist id="units"><option>كجم</option><option>جرام</option><option>لتر</option><option>حبة</option><option>علبة</option><option>كيس</option><option>عبوة</option><option>كرتون</option><option>ربطة</option><option>دزينة</option></datalist>
-  <div class="fg"><label for="sh-price">سعر الوحدة</label><input inputmode="decimal" id="sh-price" placeholder="٠"/></div>
+  <div class="fg"><label for="sh-price">سعر الوحدة</label><input inputmode="decimal" id="sh-price" placeholder="٠"/><small class="mut" id="sh-price-status" style="display:block;margin-top:6px;line-height:1.6"></small></div>
   <div class="cd" id="sh-tot"></div>
   <div class="fg"><label for="sh-store">المتجر</label><input id="sh-store"/></div>
   <div class="two"><button class="btn s" data-close>إلغاء</button><button class="btn" id="sh-save">حفظ</button></div>
@@ -501,7 +508,7 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
   <div class="two"><button class="btn s" data-close>إلغاء</button><button class="btn" id="bx-save">حفظ</button></div>
 </div></div>
 
-<div class="ov" id="m-auth"><div class="sheet"><div class="handle"></div>
+<div class="ov" id="m-auth"><div class="sheet" style="position:relative"><div class="auth-loading" id="auth-loading"><div class="auth-loading-card"><div class="auth-spinner"></div><b>جاري إنشاء الحساب</b><p>لحظات ونجهز حسابك ونحفظ بياناتك بأمان</p></div></div><div class="handle"></div>
   <h3>حسابي في خدماتي</h3>
   <div class="fg"><div class="seg" id="au-mode"><button data-v="in" class="on">دخول</button><button data-v="new">حساب جديد</button></div></div>
   <div class="fg" id="g-name"><label for="a-name">الاسم</label><input id="a-name" autocomplete="name"/></div>
@@ -521,9 +528,9 @@ input[type=range]{width:100%;accent-color:var(--blue);height:28px}
 
 <script>
 const $=id=>document.getElementById(id);
-const P={gear:'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z',fwd:'M9 5l7 7-7 7',home:'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',box:'M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8',cart:'M3 4h2l2.4 11h10.4l2-8H6.2M9 20.5h.01M17 20.5h.01',wallet:'M3 7a2 2 0 012-2h13v4M3 7v11a2 2 0 002 2h15a1 1 0 001-1v-9a1 1 0 00-1-1H5a2 2 0 01-2-2zM16.5 14.5h.01',plus:'M12 5v14M5 12h14',back:'M15 5l-7 7 7 7',check:'M5 12.5l4.5 4.5L19 7.5',alert:'M12 8v5M12 17h.01M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z',list:'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',target:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01',kitchen:'M6 3v7a3 3 0 003 3v8M9 3v6M12 3v10M18 3c-2 1-3 4-3 7h3v11',pantry:'M4 4h16v16H4zM4 12h16M9 8h6M9 16h6',clean:'M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z',devices:'M3 5h12v9H3zM8 18h2M15 8h6v11h-6z',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0',wrench:'M14.7 6.3a4 4 0 005 5L21 21l-3 1-8.5-8.5a4 4 0 01-5-5l3 3 2.5-2.5-3-3a4 4 0 015 .3z',pin:'M12 21s7-6.2 7-11.5a7 7 0 10-14 0C5 14.800 12 21 12 21zM12 12a2.500 2.500 0 100-5 2.500 2.500 0 000 5z',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',edit:'M4 20h4L19 9l-4-4L4 16v4z',leaf:'M5 19c0-9 5-14 15-14 0 10-5 15-14 15M5 19c2-5 6-8 10-10',drop:'M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z',heart:'M20.8 5.6a5 5 0 00-7.1 0L12 7.3l-1.7-1.7a5 5 0 00-7.1 7.1L12 21l8.8-8.3a5 5 0 000-7.1z',car:'M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h14l2 5v3a2 2 0 01-2 2M5 17v2M19 17v2M7 13h.01M17 13h.01',book:'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13',gift:'M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H8.5a2.5 2.5 0 110-5C11 2 12 7 12 7zM12 7h3.5a2.5 2.5 0 100-5C13 2 12 7 12 7z',bed:'M3 18V6M3 14h18v4M21 14v-2a3 3 0 00-3-3h-7v5',tag:'M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01'};
+const P={gear:'M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z',fwd:'M9 5l7 7-7 7',home:'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10',box:'M21 8l-9-5-9 5v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8',cart:'M3 4h2l2.4 11h10.4l2-8H6.2M9 20.5h.01M17 20.5h.01',wallet:'M3 7a2 2 0 012-2h13v4M3 7v11a2 2 0 002 2h15a1 1 0 001-1v-9a1 1 0 00-1-1H5a2 2 0 01-2-2zM16.5 14.5h.01',plus:'M12 5v14M5 12h14',back:'M15 5l-7 7 7 7',check:'M5 12.5l4.5 4.5L19 7.5',alert:'M12 8v5M12 17h.01M10.3 3.9L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z',list:'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',target:'M12 21a9 9 0 100-18 9 9 0 000 18zM12 16a4 4 0 100-8 4 4 0 000 8zM12 12h.01',kitchen:'M6 3v7a3 3 0 003 3v8M9 3v6M12 3v10M18 3c-2 1-3 4-3 7h3v11',pantry:'M4 4h16v16H4zM4 12h16M9 8h6M9 16h6',clean:'M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3zM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z',devices:'M3 5h12v9H3zM8 18h2M15 8h6v11h-6z',user:'M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0',wrench:'M14.7 6.3a4 4 0 005 5L21 21l-3 1-8.5-8.5a4 4 0 01-5-5l3 3 2.5-2.5-3-3a4 4 0 015 .3z',pin:'M12 21s7-6.2 7-11.5a7 7 0 10-14 0C5 14.800 12 21 12 21zM12 12a2.500 2.500 0 100-5 2.500 2.500 0 000 5z',trash:'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3',edit:'M4 20h4L19 9l-4-4L4 16v4z',leaf:'M5 19c0-9 5-14 15-14 0 10-5 15-14 15M5 19c2-5 6-8 10-10',drop:'M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z',heart:'M20.8 5.6a5 5 0 00-7.1 0L12 7.3l-1.7-1.7a5 5 0 00-7.1 7.1L12 21l8.8-8.3a5 5 0 000-7.1z',car:'M5 17h14M5 17a2 2 0 01-2-2v-3l2-5h14l2 5v3a2 2 0 01-2 2M5 17v2M19 17v2M7 13h.01M17 13h.01',book:'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2V5zM4 19a2 2 0 012-2h13',gift:'M20 12v9H4v-9M2 7h20v5H2zM12 21V7M12 7H8.5a2.5 2.5 0 110-5C11 2 12 7 12 7zM12 7h3.5a2.5 2.5 0 100-5C13 2 12 7 12 7z',bed:'M3 18V6M3 14h18v4M21 14v-2a3 3 0 00-3-3h-7v5',water:'M12 3s6 6.5 6 11a6 6 0 11-12 0c0-4.5 6-11 6-11z',food:'M4 4h16v16H4zM4 9h16M9 4v16M15 4v16',fridge:'M6 3h12v18H6zM6 10h12M9 7v1M9 14v2',medicine:'M6 3h12v18H6zM9 7h6M12 4v6M9 7h6',bath:'M4 12h16M6 12v4a3 3 0 003 3h6a3 3 0 003-3v-4M7 12V6a2 2 0 012-2 2 2 0 012 2',baby:'M5 10h14v9H5zM8 10V7a4 4 0 018 0v3M9 14h.01M15 14h.01',pet:'M7 10a2 2 0 100-4 2 2 0 000 4zM17 10a2 2 0 100-4 2 2 0 000 4zM12 18c-3 0-5-2-5-4 0-2 2-3 5-3s5 1 5 3c0 2-2 4-5 4z',tag:'M3 12V4h8l10 10-8 8L3 12zM7.5 7.5h.01'};
 const ic=(n,c='')=>`<svg class="i ${c}" viewBox="0 0 24 24"><path d="${P[n]||P.pin}"/></svg>`;
-const CATS=[['مطبخ','المطبخ','kitchen'],['مخزن','المخزن','pantry'],['تنظيف','التنظيف','clean'],['أجهزة','الأجهزة','devices'],['شخصي','شخصي','user'],['صيانة','الصيانة','wrench'],['أخرى','أخرى','pin']];
+const CATS=[['مطبخ','المطبخ','kitchen'],['مخزن','المخزن','pantry'],['تنظيف','التنظيف','clean'],['أجهزة','الأجهزة','devices'],['مياه ومشروبات','مياه ومشروبات','water'],['أغذية','أغذية','food'],['ثلاجة','الثلاجة','fridge'],['صحة وأدوية','صحة وأدوية','medicine'],['حمام','الحمام','bath'],['أطفال','الأطفال','baby'],['حيوانات','حيوانات أليفة','pet'],['شخصي','شخصي','user'],['صيانة','الصيانة','wrench'],['أخرى','أخرى','pin']];
 const icOf=c=>(cats.find(x=>x.name===c)||{}).icon||'pin';
 const num=n=>Number(n||0).toLocaleString('ar-SA');
 const money=n=>num(n)+' '+cfg.cur;
@@ -555,7 +562,7 @@ function apply(){const r=document.documentElement,c=cfg,st=r.style;
   document.body.classList.toggle('calm',!!c.calm);
   document.querySelector('meta[name=theme-color]').content=m==='dark'?'#0A1220':getComputedStyle(r).getPropertyValue('--blue').trim();}
 apply();matchMedia('(prefers-color-scheme:dark)').addEventListener?.('change',()=>cfg.mode==='auto'&&apply());
-const save=()=>{sv('needs',needs);sv('shop',shop);sv('fut',fut);sv('bud',bud);sv('cats',cats);sv('shopSecs',shopSecs);window.cloudPush&&cloudPush()};
+const save=()=>{sv('needs',needs);sv('shop',shop);sv('fut',fut);sv('bud',bud);sv('cats',cats);sv('shopSecs',shopSecs);if(!navigator.onLine)sv('pendingSync',true);window.cloudPush&&cloudPush()};
 const badge=s=>`<span class="badge ${{'متوفر':'b-ok','منخفض':'b-low','ناقص':'b-out'}[s]||'b-n'}">${s}</span>`;
 const toBuy=()=>r2(shop.filter(s=>!s.done).reduce((a,i)=>a+lineT(i),0)),shopAll=()=>r2(shop.reduce((a,i)=>a+lineT(i),0));
 
@@ -683,7 +690,7 @@ $('n-save').onclick=()=>{const d={name:val('n-name'),category:$('n-cat').value,c
   const id=$('n-id').value;id?Object.assign(find('n',id),d):needs.unshift({id:uid(),...d});close('m-need');render()};
 
 let shopQ='',hideDone=false,colp={},secK='needs',secI='box',priceCollapsed=!!bud.priceCollapsed;
-const SIC=['kitchen','pantry','clean','devices','user','wrench','box','cart','leaf','drop','heart','car','book','gift','bed','tag','home','pin'];
+const SIC=['kitchen','pantry','clean','devices','water','food','fridge','medicine','bath','baby','pet','user','wrench','box','cart','leaf','drop','heart','car','book','gift','bed','tag','home','pin'];
 const secOf=i=>shopSecs.some(x=>x.name===i.sec)?i.sec:'بدون قسم';
 function fillSel(){$('n-cat').innerHTML=cats.map(c=>`<option>${esc(c.name)}</option>`).join('');$('sh-sec').innerHTML=shopSecs.map(c=>`<option>${esc(c.name)}</option>`).join('')+'<option value="">بدون قسم</option>'}
 function addTile(k){return `<button class="cat" data-sec="${k}"><div class="ci">${ic('plus')}</div><b>قسم جديد</b><span>إضافة وتعديل</span></button>`}
@@ -711,7 +718,15 @@ function clearDone(){const rm=shop.filter(i=>i.done);if(!rm.length)return toast(
 function shareList(){const L=['🛒 قائمة المقاضي — '+user.home];[...shopSecs.map(x=>x.name),'بدون قسم'].forEach(n=>{const it=shop.filter(i=>!i.done&&secOf(i)===n);if(!it.length)return;L.push('','▪ '+n);it.forEach(i=>L.push(`- ${i.name} ${num(i.qty)}${i.unit?' '+i.unit:''}${lineT(i)?' — '+money(lineT(i)):''}`))});L.push('','الإجمالي المتبقي: '+money(toBuy()));const t=L.join('\n');
   if(navigator.share)navigator.share({text:t}).catch(()=>{});else navigator.clipboard.writeText(t).then(()=>toast('تم نسخ القائمة')).catch(()=>toast('تعذّر النسخ'))}
 const shTot=()=>$('sh-tot').innerHTML='إجمالي هذا المنتج: <b>'+money(r2(toN($('sh-qty').value)*toN($('sh-price').value)))+'</b>';
-function addShop(){$('sh-sug').innerHTML='';$('sh-id').value='';$('m-shop-t').textContent='إضافة منتج';fillSel();['sh-name','sh-unit','sh-price','sh-store'].forEach(i=>$(i).value='');$('sh-qty').value=1;$('sh-sec').value=shopSecs[0]?shopSecs[0].name:'';shTot();show('shop');open('m-shop');setTimeout(()=>$('sh-name').focus(),350)}
+let priceTimer=null,priceBusy=false;
+const PRICE_API_ENDPOINT=localStorage.getItem('kh2_price_api_endpoint')||'';
+async function autoPrice(){const name=val('sh-name'),status=$('sh-price-status'),input=$('sh-price');if(!name||$('sh-id').value)return;clearTimeout(priceTimer);priceTimer=setTimeout(async()=>{
+ const saved=(bud.prices||[]).find(p=>nz(p.name)===nz(name));if(saved){input.value=saved.price;status.textContent='تم العثور على سعر محفوظ في التسعير';shTot();return}
+ if(!navigator.onLine){status.textContent='فشل التسعير التلقائي؛ أدخل السعر يدويًا';return}
+ if(!PRICE_API_ENDPOINT){status.textContent='فشل التسعير التلقائي؛ أدخل السعر يدويًا';return}
+ priceBusy=true;input.disabled=true;status.textContent='جاري التسعير التلقائي…';try{const u=PRICE_API_ENDPOINT+'?q='+encodeURIComponent(name);const r=await fetch(u);if(!r.ok)throw Error('price');const d=await r.json(),x=d.items&&d.items[0];if(x&&x.cheapest&&x.cheapest.price){input.value=x.cheapest.price;status.textContent='تم جلب أقل سعر رسمي من '+(x.cheapest.retailerName?.ar||x.cheapest.retailer||'المتاجر');shTot()}else status.textContent='فشل التسعير التلقائي؛ أدخل السعر يدويًا'}catch(e){status.textContent='فشل التسعير التلقائي؛ أدخل السعر يدويًا'}finally{priceBusy=false;input.disabled=false}
+},450)}
+function addShop(){$('sh-price-status').textContent='';$('sh-sug').innerHTML='';$('sh-id').value='';$('m-shop-t').textContent='إضافة منتج';fillSel();['sh-name','sh-unit','sh-price','sh-store'].forEach(i=>$(i).value='');$('sh-qty').value=1;$('sh-sec').value=shopSecs[0]?shopSecs[0].name:'';shTot();show('shop');open('m-shop');setTimeout(()=>$('sh-name').focus(),350)}
 function editShop(id){$('sh-sug').innerHTML='';const i=find('s',id);fillSel();$('sh-id').value=id;$('m-shop-t').textContent='تعديل منتج';$('sh-name').value=i.name;$('sh-sec').value=i.sec||'';$('sh-qty').value=i.qty;$('sh-unit').value=i.unit||'';$('sh-price').value=i.price||'';$('sh-store').value=i.store||'';shTot();open('m-shop')}
 $('add-shop').onclick=addShop;
 ['sh-qty','sh-price'].forEach(x=>$(x).addEventListener('input',shTot));
@@ -742,7 +757,7 @@ $('pr-save').onclick=()=>{const name=val('pr-name'),price=toN($('pr-price').valu
   const id=$('pr-id').value,ex=bud.prices.find(x=>nz(x.name)===nz(name)&&x.id!==id);if(ex&&!confirm('«'+ex.name+'» مسجّل مسبقًا. تحديث سعره؟'))return;
   if(ex){Object.assign(ex,{name,price,unit});if(id)bud.prices=bud.prices.filter(x=>x.id!==id)}else if(id)Object.assign(bud.prices.find(x=>x.id===id),{name,price,unit});else bud.prices.unshift({id:uid(),name,price,unit});
   close('m-price');render();toast('تم حفظ السعر')};
-$('sh-name').addEventListener('input',()=>{const q=nz($('sh-name').value),P=bud.prices||[];if(!q){$('sh-sug').innerHTML='';return}
+$('sh-name').addEventListener('input',()=>{autoPrice();const q=nz($('sh-name').value),P=bud.prices||[];if(!q){$('sh-sug').innerHTML='';return}
   const ex=P.find(p=>nz(p.name)===q);if(ex&&!toN($('sh-price').value)){$('sh-price').value=ex.price;if(!val('sh-unit'))$('sh-unit').value=ex.unit||'';shTot()}
   const m=[...P.filter(p=>nz(p.name).startsWith(q)),...P.filter(p=>!nz(p.name).startsWith(q)&&nz(p.name).includes(q))].slice(0,5);
   $('sh-sug').innerHTML=m.map(p=>`<button type="button" class="chip2" data-pp="${p.id}">${esc(p.name)} · ${money(p.price)}</button>`).join('')});
@@ -885,6 +900,7 @@ $('exp').onclick=()=>{const d={};Object.keys(localStorage).filter(k=>k.startsWit
 $('imp').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const d=JSON.parse(t);Object.keys(d).filter(k=>k.startsWith('kh2_')).forEach(k=>localStorage.setItem(k,d[k]));location.reload()}catch(x){toast('الملف غير صالح')}})};
 $('wipe').onclick=()=>{if(confirm('سيتم حذف كل بياناتك من هذا الجهاز. هل أنت متأكد؟')){Object.keys(localStorage).filter(k=>k.startsWith('kh2_')).forEach(k=>localStorage.removeItem(k));location.reload()}};
 
+const setAuthLoading=on=>{const e=$('auth-loading');if(e)e.classList.toggle('show',!!on);$('a-go').disabled=!!on};
 const openAuth=()=>window.cloudReady?open('m-auth'):toast(navigator.onLine?'جارٍ تجهيز المزامنة، حاول بعد لحظات':'تحتاج اتصالًا بالإنترنت لتسجيل الدخول');
 $('w-login').onclick=openAuth;
 
@@ -924,15 +940,15 @@ const A=await import(G+'firebase-auth.js'),F=await import(G+'firebase-firestore.
 const app=initializeApp(FIREBASE_CONFIG),auth=A.getAuth(app),db=F.initializeFirestore(app,{localCache:F.persistentLocalCache()});
 window.cloudReady=true;
 let uid=null,uname='',me={},homeId=null,homeData=null,unsubH=null,unsubR=null,unsubQ=null,rw='',reqs=[],myReq=null,timer,last='',creating=false,signingUp=false,mode='in';
-const ERR={'auth/invalid-credential':'رقم التعريف أو كلمة المرور غير صحيحة','auth/wrong-password':'كلمة المرور غير صحيحة','auth/user-not-found':'لا يوجد حساب بهذا الرقم','auth/email-already-in-use':'رقم التعريف مستخدم، اختر غيره','auth/weak-password':'كلمة المرور ضعيفة','auth/network-request-failed':'لا يوجد اتصال بالإنترنت','auth/too-many-requests':'محاولات كثيرة، انتظر قليلًا'};
+const ERR={'auth/invalid-credential':'رقم التعريف أو كلمة المرور غير صحيحة','auth/wrong-password':'كلمة المرور غير صحيحة','auth/user-not-found':'لا يوجد حساب بهذا الرقم','auth/email-already-in-use':'هذا الرقم مسجل بالفعل. إذا بدأت التسجيل سابقًا، اختر «دخول» واستخدم كلمة المرور نفسها.','auth/weak-password':'كلمة المرور ضعيفة','auth/network-request-failed':'لا يوجد اتصال بالإنترنت','auth/too-many-requests':'محاولات كثيرة، انتظر قليلًا','auth/operation-not-allowed':'طريقة التسجيل بالبريد وكلمة المرور غير مفعّلة في Firebase Auth','auth/unauthorized-domain':'هذا النطاق غير مضاف إلى Authorized domains في Firebase','permission-denied':'تم رفض حفظ بيانات الحساب. راجع قواعد Firestore'};
 const OKID=/^[a-z0-9_]{3,20}$/,em=i=>i+'@khadamati.app';
 const hRef=id=>F.doc(db,'homes',id),uRef=()=>F.doc(db,'users',uid),qRef=u=>F.doc(db,'homes',homeId,'requests',u),nRef=n=>F.doc(db,'usernames',n);
 const amsg=t=>$('a-msg').textContent=t,stat=t=>{const e=$('sync-st');if(e)e.textContent=t};
 const genCode=()=>{const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return[...crypto.getRandomValues(new Uint8Array(12))].map(b=>A[b%32]).join('')};
 const snap=()=>JSON.parse(JSON.stringify({name:user&&user.home,needs,shop,fut,bud,cats,shopSecs}));
 window.cloudPush=()=>{if(!uid||window._np)return;clearTimeout(timer);timer=setTimeout(push,700)};
-async function push(){if(!user)return;if(!homeId)return ensureHome();const d=snap(),h=JSON.stringify(d);if(h===last)return;last=h;const ts=Date.now();localStorage.setItem('kh2_ts',ts);stat('جارٍ الحفظ…');
-  try{await F.setDoc(hRef(homeId),{...d,updatedAt:ts,by:uid},{merge:true});stat('تمت المزامنة ✓')}catch(e){last='';stat('تعذّر الحفظ، ستُعاد المحاولة')}}
+async function push(){if(!user)return;if(!navigator.onLine){sv('pendingSync',true);return}if(!homeId)return ensureHome();const d=snap(),h=JSON.stringify(d);if(h===last&&!ld('pendingSync',false))return;last=h;const ts=Date.now();localStorage.setItem('kh2_ts',ts);stat('جارٍ الحفظ…');
+  try{await F.setDoc(hRef(homeId),{...d,updatedAt:ts,by:uid},{merge:true});sv('pendingSync',false);stat('تمت المزامنة ✓')}catch(e){last='';sv('pendingSync',true);stat('تعذّر الحفظ، ستُعاد المحاولة')}}
 async function ensureHome(){if(!user||!uid||homeId||creating)return;creating=true;
   try{const code=genCode(),d=snap(),ts=Date.now();
     await F.setDoc(hRef(code),{owner:uid,ownerUname:uname,members:[uid],names:{[uid]:me.name||user.name},acceptRequests:true,...d,updatedAt:ts,by:uid});
@@ -1025,15 +1041,25 @@ $('sync-box').addEventListener('click',e=>{const id=e.target.id;if(id==='s-in')o
 /* ----- الحساب ----- */
 function setMode(m){mode=m;[...$('au-mode').children].forEach(b=>b.classList.toggle('on',b.dataset.v===m));$('g-name').style.display=$('g-fam').style.display=m==='new'?'':'none';$('a-go').textContent=m==='new'?'إنشاء الحساب':'دخول';amsg('')}
 $('au-mode').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.v)};setMode('in');
+async function finishSignup(c,id,pw,name,fam){
+  uid=c.user.uid;uname=id;me={name,uname:id};let syncError=null;
+  try{await F.setDoc(uRef(),me);await F.setDoc(nRef(id),{uid,homeId:null})}catch(e){syncError=e}
+  if(!user){user={name,home:'منزلي'};sv('user',user);$('welcome').classList.add('out');enter()}
+  signingUp=false;setAuthLoading(false);await boot(c.user);$('m-auth').classList.remove('show');
+  if(syncError)toast('تم إنشاء الحساب، لكن تعذرت مزامنة الملف الآن. سيُعاد الحفظ عند توفر الصلاحيات والاتصال');
+  else toast('تم إنشاء الحساب بنجاح');
+  if(fam)await sendReq(fam)
+}
 $('a-go').onclick=async()=>{const id=val('a-id').toLowerCase(),pw=$('a-pass').value,name=val('a-name'),fam=val('a-fam');
   if(!OKID.test(id))return amsg('رقم التعريف: ٣ إلى ٢٠ خانة من حروف إنجليزية وأرقام و _');
   if(mode==='new'){if(!name)return amsg('اكتب اسمك');if(pw.length<8)return amsg('كلمة المرور ٨ خانات على الأقل');
-    amsg('جارٍ إنشاء الحساب…');signingUp=true;
-    try{const c=await A.createUserWithEmailAndPassword(auth,em(id),pw);uid=c.user.uid;uname=id;me={name,uname:id};
-      await F.setDoc(uRef(),me);await F.setDoc(nRef(id),{uid,homeId:null});
-      if(!user){user={name,home:'منزلي'};sv('user',user);$('welcome').classList.add('out');enter()}
-      signingUp=false;await boot(c.user);$('m-auth').classList.remove('show');if(fam)await sendReq(fam)}
-    catch(e){signingUp=false;amsg(ERR[e.code]||'تعذّر إنشاء الحساب')}}
+    amsg('جارٍ إنشاء الحساب…');signingUp=true;setAuthLoading(true);
+    try{const c=await A.createUserWithEmailAndPassword(auth,em(id),pw);await finishSignup(c,id,pw,name,fam)}
+    catch(e){
+      if(e.code==='auth/email-already-in-use'){
+        try{amsg('وجدنا تسجيلًا سابقًا بهذا الرقم، جارٍ استكماله…');const c=await A.signInWithEmailAndPassword(auth,em(id),pw);await finishSignup(c,id,pw,name,fam)}
+        catch(x){signingUp=false;setAuthLoading(false);amsg(x.code==='auth/invalid-credential'||x.code==='auth/wrong-password'?'هذا الرقم مستخدم. استخدم «دخول» مع كلمة مرور الحساب أو اختر رقمًا آخر.':ERR[x.code]||'تعذر استكمال الحساب الموجود')}}
+      else{signingUp=false;setAuthLoading(false);amsg(ERR[e.code]||'تعذّر إنشاء الحساب')}}}
   else{if(!pw)return amsg('اكتب كلمة المرور');amsg('جارٍ التحقق…');try{await A.signInWithEmailAndPassword(auth,em(id),pw)}catch(e){amsg(ERR[e.code]||'تعذّر الدخول')}}};
 function cleanup(){[unsubH,unsubR,unsubQ].forEach(f=>f&&f());unsubH=unsubR=unsubQ=null;rw='';reqs=[];myReq=null;homeId=null;homeData=null;last='';dot()}
 async function boot(u){cleanup();uid=u.uid;uname=(u.email||'').split('@')[0];
@@ -1047,7 +1073,9 @@ A.onAuthStateChanged(auth,async u=>{if(signingUp)return;if(!u){cleanup();uid=nul
 box(null);homeBox();
 }
 let cloudBusy=false;async function tryCloud(){if(window.cloudReady||cloudBusy)return;cloudBusy=true;try{await startCloud()}catch(e){console.warn('cloud unavailable',e)}cloudBusy=false}
-tryCloud();addEventListener('online',tryCloud);
+tryCloud();
+addEventListener('online',()=>{tryCloud();setTimeout(()=>{if(window.cloudPush)cloudPush()},1800)});
+addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&navigator.onLine&&window.cloudPush)cloudPush()});
 </script>
 </body>
 </html>

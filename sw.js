@@ -1,4 +1,4 @@
-const V='khadamati-v11',CORE=V+'-core',RT=V+'-rt';
+const V='khadamati-v13',CORE=V+'-core',RT=V+'-rt';
 const ASSETS=['./','./index.html','./manifest.json','./manus-routes.json','./assets/logo.png','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-maskable-512.png','./assets/apple-touch-icon.png'];
 const G='https://www.gstatic.com/firebasejs/10.14.1/',FB=['firebase-app.js','firebase-auth.js','firebase-firestore.js'].map(f=>G+f);
 const EXT=/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|www\.gstatic\.com\/firebasejs)\//;
