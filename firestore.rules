@@ -1,0 +1,124 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isMember(homeId) {
+      return signedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/homes/$(homeId)).data.members;
+    }
+
+    function isHomeOwner(homeId) {
+      return signedIn()
+        && get(/databases/$(database)/documents/homes/$(homeId)).data.owner == request.auth.uid;
+    }
+
+    function validProduct() {
+      return request.resource.data.keys().hasOnly([
+          'name', 'nameKey', 'barcode', 'imageUrl', 'source',
+          'sourceUrl', 'createdBy', 'createdAt'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.nameKey is string
+        && request.resource.data.nameKey.size() >= 2
+        && request.resource.data.nameKey.size() <= 120
+        && request.resource.data.barcode is string
+        && request.resource.data.barcode.size() <= 32
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imageUrl.size() <= 500
+        && request.resource.data.source in ['openfoodfacts', 'shared']
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt is number;
+    }
+
+    // ملف المستخدم: لا يستطيع المستخدم قراءة أو تعديل ملف مستخدم آخر.
+    match /users/{uid} {
+      allow read, create, update: if signedIn()
+        && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // رقم تعريف العائلة/المستخدم.
+    match /usernames/{username} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn()
+        && resource.data.uid == request.auth.uid;
+    }
+
+    // بيانات المنزل المشتركة.
+    match /homes/{homeId} {
+      allow read: if signedIn()
+        && request.auth.uid in resource.data.members;
+
+      // إنشاء منزل جديد لصاحبه فقط.
+      allow create: if signedIn()
+        && request.resource.data.owner == request.auth.uid
+        && request.auth.uid in request.resource.data.members;
+
+      // صاحب المنزل يدير الأعضاء والطلبات، والأعضاء يحدّثون بيانات المنزل
+      // مع إبقاء المالك والأعضاء والأسماء كما هي.
+      allow update: if isHomeOwner(homeId)
+        || (isMember(homeId)
+          && request.resource.data.owner == resource.data.owner
+          && request.resource.data.members == resource.data.members
+          && request.resource.data.names == resource.data.names);
+
+      allow delete: if isHomeOwner(homeId);
+
+      match /requests/{requestId} {
+        // العضو أو صاحب الطلب يستطيع قراءة طلبه.
+        allow read: if isHomeOwner(homeId)
+          || (signedIn() && request.auth.uid == requestId)
+          || isMember(homeId);
+
+        // المستخدم يرسل طلبًا باسمه فقط، ولمنزل يسمح باستقبال الطلبات.
+        allow create: if signedIn()
+          && request.auth.uid == requestId
+          && request.resource.data.uid == request.auth.uid
+          && get(/databases/$(database)/documents/homes/$(homeId)).data.acceptRequests != false;
+
+        // صاحب المنزل وحده يغيّر حالة الطلب إلى قبول/رفض/حظر.
+        allow update: if isHomeOwner(homeId);
+
+        // صاحب المنزل أو صاحب الطلب يستطيع حذف الطلب.
+        allow delete: if isHomeOwner(homeId)
+          || (signedIn() && request.auth.uid == requestId);
+      }
+    }
+
+    // قائمة الأسعار العامة المشتركة بين جميع المستخدمين والعائلات.
+    match /sharedPrices/{priceId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'name', 'nameKey', 'priceSAR', 'unit', 'store', 'updatedAt', 'submittedBy'
+        ])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 120
+        && request.resource.data.nameKey is string
+        && request.resource.data.nameKey.size() >= 2
+        && request.resource.data.nameKey.size() <= 120
+        && request.resource.data.priceSAR is number
+        && request.resource.data.priceSAR > 0
+        && request.resource.data.priceSAR <= 100000
+        && request.resource.data.unit is string
+        && request.resource.data.unit.size() <= 30
+        && request.resource.data.store is string
+        && request.resource.data.store.size() <= 80
+        && request.resource.data.updatedAt is number
+        && request.resource.data.submittedBy == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}
