@@ -1,9 +1,9 @@
-const V='khadamati-v15',CORE=V+'-core',RT=V+'-rt';
-const ASSETS=['./','./index.html','./manifest.json','./manus-routes.json','./assets/logo.png','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-maskable-512.png','./assets/apple-touch-icon.png'];
+const V='khadamati-v16',CORE=V+'-core',RT=V+'-rt';
+const ASSETS=['./','./index.html','./manifest.json','./manus-routes.json','./logo.png','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon.png'];
 const G='https://www.gstatic.com/firebasejs/10.14.1/',FB=['firebase-app.js','firebase-auth.js','firebase-firestore.js'].map(f=>G+f);
 const EXT=/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|www\.gstatic\.com\/firebasejs)\//;
 const LIVE=/firestore\.googleapis|identitytoolkit|securetoken|firebaseinstallations|jsonbin/;
-self.addEventListener('install',e=>e.waitUntil(caches.open(CORE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('install',e=>e.waitUntil(caches.open(CORE).then(c=>Promise.all(ASSETS.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting())));
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CORE&&x!==RT).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 self.addEventListener('message',e=>{if(e.data==='SKIP')self.skipWaiting();if(e.data==='WARM')e.waitUntil(warm())});
 async function warm(){const c=await caches.open(RT),seen=new Set();
